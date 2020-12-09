@@ -91,13 +91,13 @@ for species in hits:
             if h not in cluster:
                 cluster[h] = []
 
-            cluster[h].append([int(row[8]),int(row[9])])
+            cluster[h].append([q,int(row[8]),int(row[9])])
 
             if h not in seen:
-                seen[h] = {q: 1}
+                seen[h]     = {q: 1}
                 ctgrange[h] = [hstart,hend]
             else:
-                seen[h][q] = 1
+                seen[h][q]     = 1
                 ctgrange[h][0] = min(hstart,ctgrange[h][0])
                 ctgrange[h][1] = max(hend,ctgrange[h][1])
 
@@ -105,13 +105,14 @@ for species in hits:
             cluster_classify = None
             for clname,genenames in cluster_expected.items():
                 expected_len = len(genenames)
-                gene_count  = 0
+                gene_count   = 0
                 for g in genenames:
                     if g in seen[contig]:
                         gene_count += 1
                 if  gene_count == expected_len:
                     cluster_classify = clname
                     break
+
             if not cluster_classify:
                 print("no cluster collection of genes found in {}".format(contig))
                 continue
@@ -121,7 +122,7 @@ for species in hits:
 
             print("seq is {}".format(seq.id))
             print("slicing for {}_{}:{}..{}".format(species,contig,ctgrange[contig][0],ctgrange[contig][1]))
-            slice = seq[ ctgrange[contig][0]:ctgrange[contig][1] ] # cut a slice out
+            slice = seq[ ctgrange[ contig][0]:ctgrange[contig][1] ] # cut a slice out
             slice.id = "{}_{}".format(species,seq.id)
             SeqIO.write(slice, os.path.join(args.clusterout,cluster_classify,"{}_{}.gbk".format(species,contig)), "genbank")
 
