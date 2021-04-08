@@ -45,7 +45,8 @@ with open(taxonomytable,"rt") as fh:
         clades[clade].append([prefix,species,straininfo])
 
 nameparse = re.compile(r'^([^\.]+)\.(\S+)')
-
+MASTERSRC = ""
+MASTERNAME=""
 for fname in os.listdir(indir):
     if not fname.endswith(".gbk"):
         continue
@@ -72,4 +73,15 @@ for fname in os.listdir(indir):
         sourcepath = os.path.realpath(os.path.join(indir,fname))
         destpath   = os.path.join(odir,fullname)
         print("ln -s {} {}".format(sourcepath, destpath))
-        os.symlink( sourcepath, destpath )
+        if not os.path.islink(destpath):
+            os.symlink( sourcepath, destpath )
+        if species == "Aspergillus fumigatus":
+            MASTERSRC=sourcepath
+            MASTERNAME=fullname
+for clade in clades:
+    if not os.path.isdir(os.path.join(outdir,clade)):
+        continue
+    dest = os.path.join(outdir,clade,MASTERNAME)
+    if not os.path.islink(dest):
+        print("Adding MASTER {} -> {}".format(MASTERSRC,dest))
+        os.symlink(MASTERSRC,dest)
